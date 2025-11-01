@@ -8,31 +8,51 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes dna-helix {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 200px 400px;
+  }
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  overflow: hidden;
 }
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: hsl(var(--background));
+  --dot-color: hsl(180 60% 92%);
+  --dot-size: 2px;
+  --dot-space: 40px;
+  background-image:
+    linear-gradient(90deg, transparent 45%, var(--dot-color) 50%, transparent 55%),
+    linear-gradient(transparent 45%, var(--dot-color) 50%, transparent 55%);
+  background-size: var(--dot-space) var(--dot-space), var(--dot-space) var(--dot-space);
+  background-position: 20px 20px, 0px 0px;
+  mask-image: radial-gradient(circle at center, white, transparent 60%);
+  animation: dna-helix 20s linear infinite;
+}
+
+.dark body::before {
+  --dot-color: hsl(224 60% 10%);
+}
+
 
 .animated-background {
-  background: linear-gradient(
-    75deg,
-    hsl(var(--background)),
-    hsl(180 60% 92%),
-    hsl(var(--background))
-  );
-  background-size: 400% 400%;
-  animation: bg-pan 25s ease infinite;
+  background: transparent;
 }
 
-.dark .animated-background {
-    background: linear-gradient(
-    75deg,
-    hsl(var(--background)),
-    hsl(224 60% 10%),
-    hsl(var(--background))
-  );
-  background-size: 400% 400%;
-  animation: bg-pan 25s ease infinite;
-}
 
 @layer base {
   :root {

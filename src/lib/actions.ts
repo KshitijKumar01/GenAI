@@ -20,6 +20,11 @@ import {
   type AnalyzeComplianceInput
 } from '@/ai/flows/analyze-compliance-flow';
 
+import {
+  exportToJira,
+  type ExportToJiraInput
+} from '@/ai/flows/export-to-jira-flow';
+
 export async function parseDocumentAction(input: ParseDocumentAndGetFeedbackInput) {
   try {
     const output = await parseDocumentAndGetFeedback(input);
@@ -58,4 +63,14 @@ export async function analyzeComplianceAction(input: AnalyzeComplianceInput) {
       console.error(error);
       return { error: error instanceof Error ? error.message : 'An unknown error occurred during compliance analysis.' };
     }
+}
+
+export async function exportToJiraAction(input: ExportToJiraInput) {
+  try {
+    const output = await exportToJira(input);
+    return { createdIssues: output.createdIssues };
+  } catch (error) {
+    console.error(error);
+    return { error: error instanceof Error ? error.message : 'An unknown error occurred during Jira export.' };
   }
+}

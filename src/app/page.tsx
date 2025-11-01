@@ -9,7 +9,7 @@ import Step2Parse from '@/components/app/step-2-parse';
 import Step3Generate from '@/components/app/step-3-generate';
 import Step4Compliance from '@/components/app/step-4-compliance';
 import Step5Dashboard from '@/components/app/step-5-dashboard';
-import { parseDocumentAction, generateTestCasesAction, refineTestCasesAction, analyzeComplianceAction } from '@/lib/actions';
+import { parseDocumentAction, generateTestCasesAction, refineTestCasesAction, analyzeComplianceAction, exportToJiraAction } from '@/lib/actions';
 import type { TestCase, ComplianceIssue } from '@/lib/types';
 
 type AppStep = 'upload' | 'parse' | 'generate' | 'compliance' | 'dashboard';
@@ -60,14 +60,15 @@ export default function Home() {
 
   const parseTestCasesString = (text: string): TestCase[] => {
     if (!text) return [];
-    const caseBlocks = text.split(/(?=\d+\.\s)/).filter(block => block.trim() !== '');
-    return caseBlocks.map((block, index) => {
+    const caseBlocks = text.split(/(?=TC-\d+:)/).filter(block => block.trim() !== '');
+    return caseBlocks.map((block) => {
       const content = block.trim();
       const firstLine = content.split('\n')[0];
-      const titleMatch = firstLine.match(/\d+\.\s+(.*)/);
+      const idMatch = firstLine.match(/^(TC-\d+):/);
+      const titleMatch = firstLine.match(/^TC-\d+:\s*(.*)/);
       return {
-        id: `TC-${index + 1}`,
-        title: titleMatch ? titleMatch[1] : `Test Case ${index + 1}`,
+        id: idMatch ? idMatch[1] : `TC-UNKNOWN`,
+        title: titleMatch ? titleMatch[1] : `Unknown Test Case`,
         content: content,
       };
     });
@@ -186,6 +187,7 @@ export default function Home() {
             <Step5Dashboard
               testCases={testCases}
               onRestart={handleRestart}
+              exportToJiraAction={exportToJiraAction}
             />
           )}
         </div>

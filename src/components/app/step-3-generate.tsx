@@ -112,7 +112,7 @@ export default function Step3Generate({ testCases, onRefine, onProceed, isLoadin
                     <AlertDialogHeader>
                       <AlertDialogTitle>Proceed to Compliance Check?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        You can still come back and refine these test cases later if any compliance issues are found.
+                        Our AI will analyze the generated test cases for compliance with standards like FDA, GDPR, and ISO.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

@@ -7,12 +7,15 @@ import { RefreshCw, FileText } from 'lucide-react';
 import type { TestCase, Toolchain } from '@/lib/types';
 import { JiraIcon, PolarionIcon, AzureDevopsIcon } from './compliance-icons';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import type { exportToJiraAction } from '@/lib/actions';
+import { LoadingSpinner } from './loading-spinner';
 
 const toolchains: Toolchain[] = [
   { id: 'jira', name: 'Jira', Icon: JiraIcon },
@@ -23,23 +26,68 @@ const toolchains: Toolchain[] = [
 interface Step5DashboardProps {
   testCases: TestCase[];
   onRestart: () => void;
+  exportToJiraAction: typeof exportToJiraAction;
 }
 
-export default function Step5Dashboard({ testCases, onRestart }: Step5DashboardProps) {
+export default function Step5Dashboard({ testCases, onRestart, exportToJiraAction }: Step5DashboardProps) {
     const { toast } = useToast();
+    const [isExporting, setIsExporting] = useState(false);
 
-    const handleExport = (toolchainName: string) => {
-        toast({
-            title: `Exporting to ${toolchainName}`,
-            description: "This is a placeholder. In a real app, this would trigger an API call.",
-        });
+    const handleExport = async (toolchainName: string) => {
+        if (toolchainName !== 'Jira') {
+            toast({
+                title: `Export to ${toolchainName} not implemented`,
+                description: "Only Jira export is available in this demo.",
+                variant: 'destructive'
+            });
+            return;
+        }
+
+        setIsExporting(true);
+        const result = await exportToJiraAction({ testCases });
+        setIsExporting(false);
+
+        if (result.error) {
+            toast({
+                variant: 'destructive',
+                title: 'Jira Export Failed',
+                description: result.error,
+            });
+        } else if (result.createdIssues) {
+            toast({
+                title: 'Export to Jira Successful!',
+                description: `${result.createdIssues.length} issue(s) created. Check the console for details.`,
+            });
+            console.log('Created Jira Issues:', result.createdIssues);
+        }
     };
     
-    const handleDownload = (format: string) => {
-        toast({
-            title: `Downloading as ${format}`,
-            description: "This is a placeholder for file download functionality.",
-        });
+    const downloadFile = (content: string, fileName: string, contentType: string) => {
+        const a = document.createElement("a");
+        const file = new Blob([content], { type: contentType });
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+
+    const handleDownloadCSV = () => {
+        const headers = ['id', 'title', 'content'];
+        const csvRows = [
+            headers.join(','),
+            ...testCases.map(tc => {
+                const values = [tc.id, tc.title, `"${tc.content.replace(/"/g, '""')}"`];
+                return values.join(',');
+            })
+        ];
+        downloadFile(csvRows.join('\n'), 'test-cases.csv', 'text/csv');
+        toast({ title: 'Success', description: 'Test cases downloaded as CSV.'});
+    };
+
+    const handleDownloadJSON = () => {
+        const jsonContent = JSON.stringify(testCases, null, 2);
+        downloadFile(jsonContent, 'test-cases.json', 'application/json');
+        toast({ title: 'Success', description: 'Test cases downloaded as JSON.'});
     };
 
   return (
@@ -83,8 +131,8 @@ export default function Step5Dashboard({ testCases, onRestart }: Step5DashboardP
           </CardHeader>
           <CardContent className="space-y-3">
             {toolchains.map(tool => (
-                <Button key={tool.id} className="w-full justify-start" variant="outline" onClick={() => handleExport(tool.name)}>
-                    <tool.Icon className="mr-2 h-5 w-5"/>
+                <Button key={tool.id} className="w-full justify-start" variant="outline" onClick={() => handleExport(tool.name)} disabled={isExporting}>
+                    {isExporting && tool.name === 'Jira' ? <LoadingSpinner className="mr-2"/> : <tool.Icon className="mr-2 h-5 w-5"/>}
                     Export to {tool.name}
                 </Button>
             ))}
@@ -95,13 +143,13 @@ export default function Step5Dashboard({ testCases, onRestart }: Step5DashboardP
             <CardHeader>
                 <CardTitle className="font-headline text-xl">Download Locally</CardTitle>
                 <CardDescription>Download test cases in various formats.</CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" onClick={() => handleDownload('CSV')}>
+                <Button className="w-full justify-start" variant="outline" onClick={handleDownloadCSV}>
                     <FileText className="mr-2" />
                     Download as .csv
                 </Button>
-                <Button className="w-full justify-start" variant="outline" onClick={() => handleDownload('JSON')}>
+                <Button className="w-full justify-start" variant="outline" onClick={handleDownloadJSON}>
                     <FileText className="mr-2" />
                     Download as .json
                 </Button>
