@@ -83,11 +83,20 @@ const exportToJiraFlow = ai.defineFlow(
     });
 
     const createdIssues: z.infer<typeof JiraIssueSchema>[] = [];
-    for(const turn of history) {
-        if (turn.role === 'model') {
-            for (const part of turn.content) {
-                if (part.toolResponse) {
-                    createdIssues.push(part.toolResponse as any);
+    if (history) {
+        for(const turn of history) {
+            if (turn.role === 'model') {
+                for (const part of turn.content) {
+                    if (part.toolResponse) {
+                        const toolResponse = part.toolResponse;
+                         // Manually construct the expected schema.
+                        const issue = {
+                            testCaseId: toolResponse.testCaseId,
+                            jiraIssueKey: toolResponse.key,
+                            jiraIssueUrl: toolResponse.url
+                        };
+                        createdIssues.push(issue);
+                    }
                 }
             }
         }

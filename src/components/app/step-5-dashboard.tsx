@@ -29,6 +29,15 @@ interface Step5DashboardProps {
   exportToJiraAction: typeof exportToJiraAction;
 }
 
+const downloadFile = (content: string, fileName: string, contentType: string) => {
+    const a = document.createElement("a");
+    const file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+};
+
 export default function Step5Dashboard({ testCases, onRestart, exportToJiraAction }: Step5DashboardProps) {
     const { toast } = useToast();
     const [isExporting, setIsExporting] = useState(false);
@@ -56,19 +65,10 @@ export default function Step5Dashboard({ testCases, onRestart, exportToJiraActio
         } else if (result.createdIssues) {
             toast({
                 title: 'Export to Jira Successful!',
-                description: `${result.createdIssues.length} issue(s) created. Check the console for details.`,
+                description: `${result.createdIssues.length} issue(s) created. Check the browser console for details.`,
             });
             console.log('Created Jira Issues:', result.createdIssues);
         }
-    };
-    
-    const downloadFile = (content: string, fileName: string, contentType: string) => {
-        const a = document.createElement("a");
-        const file = new Blob([content], { type: contentType });
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(a.href);
     };
 
     const handleDownloadCSV = () => {
@@ -76,7 +76,7 @@ export default function Step5Dashboard({ testCases, onRestart, exportToJiraActio
         const csvRows = [
             headers.join(','),
             ...testCases.map(tc => {
-                const values = [tc.id, tc.title, `"${tc.content.replace(/"/g, '""')}"`];
+                const values = [tc.id, `"${tc.title.replace(/"/g, '""')}"`, `"${tc.content.replace(/"/g, '""')}"`];
                 return values.join(',');
             })
         ];
