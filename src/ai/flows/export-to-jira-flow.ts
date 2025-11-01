@@ -7,12 +7,29 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {
-  ExportToJiraInputSchema,
-  type ExportToJiraInput,
-  ExportToJiraOutputSchema,
-  type ExportToJiraOutput
-} from './types';
+
+const TestCaseSchema = z.object({
+  id: z.string().describe("The ID of the test case (e.g., 'TC-1')."),
+  title: z.string().describe('The title of the test case.'),
+  content: z.string().describe('The full content of the test case.'),
+});
+
+const JiraIssueSchema = z.object({
+  testCaseId: z.string(),
+  jiraIssueKey: z.string(),
+  jiraIssueUrl: z.string(),
+});
+
+const ExportToJiraInputSchema = z.object({
+  testCases: z.array(TestCaseSchema).describe('An array of test cases to be exported.'),
+});
+type ExportToJiraInput = z.infer<typeof ExportToJiraInputSchema>;
+
+const ExportToJiraOutputSchema = z.object({
+  createdIssues: z.array(JiraIssueSchema).describe('A list of created Jira issues.'),
+});
+type ExportToJiraOutput = z.infer<typeof ExportToJiraOutputSchema>;
+
 
 // This is a placeholder tool. In a real application, this would
 // interact with the Jira API to create an issue.

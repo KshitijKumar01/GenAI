@@ -1,30 +1,57 @@
 'use server';
 
 import { 
-  parseDocumentAndGetFeedback
+  parseDocumentAndGetFeedback,
 } from '@/ai/flows/parse-document-and-get-feedback';
-import type { ParseDocumentAndGetFeedbackInput } from '@/ai/flows/types';
-
 import {
-  generateTestCases
+  generateTestCases,
 } from '@/ai/flows/generate-test-cases-from-parsed-requirements';
-import type { GenerateTestCasesInput } from '@/ai/flows/types';
-
 import {
-  refineGeneratedTestCasesWithFeedback
+  refineGeneratedTestCasesWithFeedback,
 } from '@/ai/flows/refine-generated-test-cases-with-feedback';
-import type { RefineGeneratedTestCasesWithFeedbackInput } from '@/ai/flows/types';
-
 import {
-  analyzeCompliance
+  analyzeCompliance,
 } from '@/ai/flows/analyze-compliance-flow';
-import type { AnalyzeComplianceInput } from '@/ai/flows/types';
-
-
 import {
-  exportToJira
+  exportToJira,
 } from '@/ai/flows/export-to-jira-flow';
-import type { ExportToJiraInput } from '@/ai/flows/types';
+
+// Define types locally as they cannot be imported from 'use server' files.
+import { z } from 'zod';
+
+const ParseDocumentAndGetFeedbackInputSchema = z.object({
+  documentDataUri: z.string(),
+  userFeedback: z.string().optional(),
+});
+type ParseDocumentAndGetFeedbackInput = z.infer<typeof ParseDocumentAndGetFeedbackInputSchema>;
+
+const GenerateTestCasesInputSchema = z.object({
+  parsedRequirements: z.string(),
+});
+type GenerateTestCasesInput = z.infer<typeof GenerateTestCasesInputSchema>;
+
+const RefineGeneratedTestCasesWithFeedbackInputSchema = z.object({
+  initialTestCases: z.string(),
+  feedback: z.string(),
+  parsedRequirements: z.string(),
+});
+type RefineGeneratedTestCasesWithFeedbackInput = z.infer<typeof RefineGeneratedTestCasesWithFeedbackInputSchema>;
+
+const AnalyzeComplianceInputSchema = z.object({
+  testCases: z.string(),
+  parsedRequirements: z.string(),
+});
+type AnalyzeComplianceInput = z.infer<typeof AnalyzeComplianceInputSchema>;
+
+const TestCaseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+});
+const ExportToJiraInputSchema = z.object({
+  testCases: z.array(TestCaseSchema),
+});
+type ExportToJiraInput = z.infer<typeof ExportToJiraInputSchema>;
 
 
 export async function parseDocumentAction(input: ParseDocumentAndGetFeedbackInput) {

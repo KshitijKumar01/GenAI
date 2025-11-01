@@ -60,15 +60,29 @@ export default function Home() {
 
   const parseTestCasesString = (text: string): TestCase[] => {
     if (!text) return [];
-    const caseBlocks = text.split(/(?=TC-\d+:)/).filter(block => block.trim() !== '');
-    return caseBlocks.map((block) => {
+    // A more robust regex to handle variations in test case formatting
+    const caseBlocks = text.split(/(?=TC-\d+\s*:|\d+\.\s*Test Case:)/gi).filter(block => block.trim() !== '');
+  
+    return caseBlocks.map((block, index) => {
       const content = block.trim();
-      const firstLine = content.split('\n')[0];
-      const idMatch = firstLine.match(/^(TC-\d+):/);
-      const titleMatch = firstLine.match(/^TC-\d+:\s*(.*)/);
+      let id = `TC-${index + 1}`;
+      let title = `Test Case ${index + 1}`;
+  
+      // Try to find an explicit ID and title
+      const idMatch = content.match(/^(TC-\d+)\s*:/i);
+      if (idMatch) {
+        id = idMatch[1];
+      }
+  
+      const titleMatch = content.match(/^(?:TC-\d+\s*:|Test Case\s*\d+[:\s]*)?\s*(.*)/i);
+      if (titleMatch && titleMatch[1]) {
+        // Take the first line as the title
+        title = titleMatch[1].split('\n')[0].trim();
+      }
+  
       return {
-        id: idMatch ? idMatch[1] : `TC-UNKNOWN`,
-        title: titleMatch ? titleMatch[1] : `Unknown Test Case`,
+        id: id,
+        title: title,
         content: content,
       };
     });
@@ -98,6 +112,7 @@ export default function Home() {
       toast({ variant: 'destructive', title: 'Refinement Error', description: result.error });
     } else if (result.refinedTestCases) {
       setTestCases(parseTestCasesString(result.refinedTestCases));
+      // Stay on the 'generate' step to allow for further refinement
       setCurrentStep('generate');
       toast({ title: 'Success', description: 'Test cases refined with your feedback.' });
     }

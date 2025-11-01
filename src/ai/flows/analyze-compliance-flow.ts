@@ -6,12 +6,25 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {
-  AnalyzeComplianceInputSchema,
-  type AnalyzeComplianceInput,
-  AnalyzeComplianceOutputSchema,
-  type AnalyzeComplianceOutput
-} from './types';
+import {z} from 'genkit';
+
+const ComplianceIssueSchema = z.object({
+  testCaseId: z.string().describe("The ID of the test case with the compliance issue (e.g., 'TC-1')."),
+  standardId: z.string().describe("The ID of the compliance standard that failed (e.g., 'fda', 'gdpr')."),
+  reason: z.string().describe("A brief explanation of why the test case fails the compliance check."),
+});
+
+const AnalyzeComplianceInputSchema = z.object({
+  testCases: z.string().describe('The full text of all generated test cases, separated by newlines.'),
+  parsedRequirements: z.string().describe('The parsed requirements document for context.'),
+});
+type AnalyzeComplianceInput = z.infer<typeof AnalyzeComplianceInputSchema>;
+
+const AnalyzeComplianceOutputSchema = z.object({
+  issues: z.array(ComplianceIssueSchema).describe('A list of compliance issues found in the test cases.'),
+});
+type AnalyzeComplianceOutput = z.infer<typeof AnalyzeComplianceOutputSchema>;
+
 
 export async function analyzeCompliance(
   input: AnalyzeComplianceInput

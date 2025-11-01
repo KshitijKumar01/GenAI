@@ -6,12 +6,20 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {
-  RefineGeneratedTestCasesWithFeedbackInputSchema,
-  type RefineGeneratedTestCasesWithFeedbackInput,
-  RefineGeneratedTestCasesWithFeedbackOutputSchema,
-  type RefineGeneratedTestCasesWithFeedbackOutput
-} from './types';
+import {z} from 'genkit';
+
+
+const RefineGeneratedTestCasesWithFeedbackInputSchema = z.object({
+  initialTestCases: z.string().describe('The initial set of generated test cases.'),
+  feedback: z.string().describe('User feedback on the initial test cases, including corrections and suggestions.'),
+  parsedRequirements: z.string().describe('The parsed requirements document to provide context.'),
+});
+type RefineGeneratedTestCasesWithFeedbackInput = z.infer<typeof RefineGeneratedTestCasesWithFeedbackInputSchema>;
+
+const RefineGeneratedTestCasesWithFeedbackOutputSchema = z.object({
+  refinedTestCases: z.string().describe('The refined set of test cases based on user feedback.'),
+});
+type RefineGeneratedTestCasesWithFeedbackOutput = z.infer<typeof RefineGeneratedTestCasesWithFeedbackOutputSchema>;
 
 
 export async function refineGeneratedTestCasesWithFeedback(

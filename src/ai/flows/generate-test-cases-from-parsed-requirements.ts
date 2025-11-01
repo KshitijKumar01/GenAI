@@ -6,12 +6,21 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {
-  GenerateTestCasesInputSchema,
-  type GenerateTestCasesInput,
-  GenerateTestCasesOutputSchema,
-  type GenerateTestCasesOutput
-} from './types';
+import {z} from 'genkit';
+
+const GenerateTestCasesInputSchema = z.object({
+  parsedRequirements: z
+    .string()
+    .describe('The parsed requirements document as a string.'),
+});
+type GenerateTestCasesInput = z.infer<typeof GenerateTestCasesInputSchema>;
+
+const GenerateTestCasesOutputSchema = z.object({
+  testCases: z
+    .string()
+    .describe('The generated test cases as a numbered, structured string.'),
+});
+type GenerateTestCasesOutput = z.infer<typeof GenerateTestCasesOutputSchema>;
 
 
 export async function generateTestCases(
