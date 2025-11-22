@@ -60,31 +60,32 @@ export default function Home() {
 
   const parseTestCasesString = (text: string): TestCase[] => {
     if (!text) return [];
-    // A more robust regex to handle variations in test case formatting
-    const caseBlocks = text.split(/(?=TC-\d+\s*:|\d+\.\s*Test Case:)/gi).filter(block => block.trim() !== '');
-  
+    // Improved regex to handle various test case formats and numbering.
+    // It looks for "TC-", "Test Case", or a number followed by a period.
+    const caseBlocks = text.split(/(?=\s*(?:TC-\d+|Test Case\s*\d+|^\d+\.)\s*[:\s])/gim).filter(block => block.trim() !== '');
+
     return caseBlocks.map((block, index) => {
-      const content = block.trim();
-      let id = `TC-${index + 1}`;
-      let title = `Test Case ${index + 1}`;
-  
-      // Try to find an explicit ID and title
-      const idMatch = content.match(/^(TC-\d+)\s*:/i);
-      if (idMatch) {
-        id = idMatch[1];
-      }
-  
-      const titleMatch = content.match(/^(?:TC-\d+\s*:|Test Case\s*\d+[:\s]*)?\s*(.*)/i);
-      if (titleMatch && titleMatch[1]) {
-        // Take the first line as the title
-        title = titleMatch[1].split('\n')[0].trim();
-      }
-  
-      return {
-        id: id,
-        title: title,
-        content: content,
-      };
+        const content = block.trim();
+        let id = `TC-${index + 1}`;
+        let title = `Test Case ${index + 1}`;
+
+        // Extract ID (e.g., TC-1, TC-VSM-AL-001)
+        const idMatch = content.match(/^(TC-[\w-]+)/i);
+        if (idMatch) {
+            id = idMatch[1].trim();
+        }
+
+        // Extract Title. Look for text after the ID and a colon, up to the first newline.
+        const titleMatch = content.match(/^(?:TC-[\w-]+:|Test Case\s*\d+[:\s]*)?\s*(.*)/i);
+        if (titleMatch && titleMatch[1]) {
+            title = titleMatch[1].split('\n')[0].trim();
+        }
+
+        return {
+            id: id,
+            title: title || `Test Case ${index + 1}`, // Fallback title
+            content: content,
+        };
     });
   };
   

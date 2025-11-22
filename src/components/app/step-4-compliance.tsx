@@ -42,7 +42,7 @@ export default function Step4Compliance({ testCases, issues, onRefine, onApprove
   };
 
   const getStandardIcon = (standardId: string) => {
-    const standard = complianceStandards.find(s => s.id === standardId.toLowerCase());
+    const standard = complianceStandards.find(s => s.id.toLowerCase() === standardId.toLowerCase());
     return standard ? <standard.Icon className="h-4 w-4" /> : null;
   };
 
@@ -57,9 +57,9 @@ export default function Step4Compliance({ testCases, issues, onRefine, onApprove
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[60vh] rounded-md border bg-muted/30">
-             <Accordion type="multiple" className="w-full">
+             <Accordion type="multiple" className="w-full" defaultValue={issues.map((issue, index) => `item-${testCases.findIndex(tc => tc.id === issue.testCaseId)}`)}>
               {testCases.map((tc, index) => {
-                const tcIssues = issues.filter(i => i.testCaseId === tc.id);
+                const tcIssues = issues.filter(i => i.testCaseId.toLowerCase() === tc.id.toLowerCase());
                 const hasIssues = tcIssues.length > 0;
                 return (
                     <AccordionItem value={`item-${index}`} key={tc.id}>
@@ -123,7 +123,7 @@ export default function Step4Compliance({ testCases, issues, onRefine, onApprove
               </Button>
               <Button onClick={onApprove} disabled={isLoading} className="bg-green-700 hover:bg-green-800">
                   <Check />
-                  {issues.length > 0 ? 'Approve with Issues' : 'Approve and Finalize'}
+                  {issues.length > 0 ? 'Approve with Issues' : 'Approve'}
               </Button>
           </CardFooter>
         </Card>
