@@ -20,7 +20,7 @@ export default function StepIndicator({ steps, currentStepIndex, onStepClick }: 
             isClickable ? (
               <button 
                 onClick={() => onStepClick(stepIdx)} 
-                className="relative"
+                className="group relative"
                 disabled={!isClickable}
               >
                 {children}

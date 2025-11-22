@@ -149,13 +149,6 @@ export default function Home() {
     setCurrentStep('upload');
   }
 
-  const handleStepClick = (stepIndex: number) => {
-    const currentStepIndex = steps.findIndex(s => s.id === currentStep);
-    if (stepIndex <= currentStepIndex) {
-      setCurrentStep(steps[stepIndex].id);
-    }
-  };
-
   const steps: { id: AppStep; name: string }[] = [
     { id: 'upload', name: 'Upload' },
     { id: 'parse', name: 'Review' },
@@ -174,7 +167,6 @@ export default function Home() {
           <StepIndicator 
             steps={steps} 
             currentStepIndex={currentStepIndex} 
-            onStepClick={handleStepClick}
           />
         </div>
         <div className="w-full max-w-6xl flex-1">
