@@ -31,6 +31,7 @@ export default function Step1Upload({ onFileSelect, onUpload, isLoading, selecte
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
       'text/xml': ['.xml'],
       'text/markdown': ['.md', '.markdown'],
     },
@@ -46,7 +47,7 @@ export default function Step1Upload({ onFileSelect, onUpload, isLoading, selecte
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Upload Requirements Document</CardTitle>
         <CardDescription>
-          Start by uploading your software requirements document. Supported formats: PDF, XML, MD.
+          Start by uploading your software requirements document. Supported formats: PDF, DOCX, XML, MD.
         </CardDescription>
       </CardHeader>
       <CardContent>
