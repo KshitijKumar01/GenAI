@@ -123,7 +123,7 @@ export default function Step4Compliance({ testCases, issues, onRefine, onApprove
               </Button>
               <Button onClick={onApprove} disabled={isLoading} className="bg-green-700 hover:bg-green-800">
                   <Check />
-                  {issues.length > 0 ? 'Approve with Issues' : 'Approve'}
+                  Approve
               </Button>
           </CardFooter>
         </Card>
