@@ -62,7 +62,7 @@ export default function Home() {
     if (!text) return [];
     // Improved regex to handle various test case formats and numbering.
     // It looks for "TC-", "Test Case", or a number followed by a period.
-    const caseBlocks = text.split(/(?=\s*(?:TC-\d+|Test Case\s*\d+|^\d+\.)\s*[:\s])/gim).filter(block => block.trim() !== '');
+    const caseBlocks = text.split(/(?=\s*(?:TC-[\w-]+|Test Case\s*\d+|^\d+\.)\s*[:\s])/gim).filter(block => block.trim() !== '');
 
     return caseBlocks.map((block, index) => {
         const content = block.trim();
@@ -149,6 +149,13 @@ export default function Home() {
     setCurrentStep('upload');
   }
 
+  const handleStepClick = (stepIndex: number) => {
+    const currentStepIndex = steps.findIndex(s => s.id === currentStep);
+    if (stepIndex <= currentStepIndex) {
+      setCurrentStep(steps[stepIndex].id);
+    }
+  };
+
   const steps: { id: AppStep; name: string }[] = [
     { id: 'upload', name: 'Upload' },
     { id: 'parse', name: 'Review' },
@@ -164,7 +171,11 @@ export default function Home() {
       <AppHeader />
       <main className="flex flex-1 flex-col items-center gap-8 p-4 md:p-8">
         <div className="w-full max-w-6xl">
-          <StepIndicator steps={steps} currentStepIndex={currentStepIndex} />
+          <StepIndicator 
+            steps={steps} 
+            currentStepIndex={currentStepIndex} 
+            onStepClick={handleStepClick}
+          />
         </div>
         <div className="w-full max-w-6xl flex-1">
           {currentStep === 'upload' && (
