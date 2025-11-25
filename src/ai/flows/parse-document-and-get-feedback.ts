@@ -77,7 +77,7 @@ import { v4 as uuidv4 } from 'uuid';
 // ---------------- CONFIG ----------------
 
 const PROJECT_ID = process.env.GCLOUD_PROJECT!;
-const BUCKET_NAME = process.env.GCLOUD_BUCKET!; // ex: "mrcms-srs-bucket"
+const BUCKET_NAME = "compliancecorpusbucket"; // ex: "mrcms-srs-bucket"
 
 // Version based naming (Option C)
 const SRS_VERSION = 'v1';

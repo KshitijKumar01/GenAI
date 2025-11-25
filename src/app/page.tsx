@@ -16,6 +16,7 @@ type AppStep = 'upload' | 'parse' | 'generate' | 'compliance' | 'dashboard';
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState<AppStep>('upload');
+  const [previousStep, setPreviousStep] = useState<AppStep>('upload');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -91,6 +92,7 @@ export default function Home() {
   
   const handleGenerateTestCases = async () => {
     setIsLoading(true);
+    setPreviousStep('generate');
     const result = await generateTestCasesAction({ parsedRequirements: parsedContent });
     if (result.error) {
       toast({ variant: 'destructive', title: 'Generation Error', description: result.error });
@@ -114,7 +116,7 @@ export default function Home() {
     } else if (result.refinedTestCases) {
       setTestCases(parseTestCasesString(result.refinedTestCases));
       // Stay on the 'generate' step to allow for further refinement
-      setCurrentStep('generate');
+      setCurrentStep(previousStep);
       toast({ title: 'Success', description: 'Test cases refined with your feedback.' });
     }
     setIsLoading(false);
@@ -122,6 +124,7 @@ export default function Home() {
   
   const handleProceedToCompliance = async () => {
     setIsLoading(true);
+    setPreviousStep('compliance');
     const testCasesText = testCases.map(tc => tc.content).join('\n\n');
     const result = await analyzeComplianceAction({
       testCases: testCasesText,
